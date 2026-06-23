@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Halocompounds — Peptide Reference Standards for Research Use Only</title>
+<meta name="description" content="Halocompounds supplies high-purity peptide reference standards for laboratory research use only (RUO). Not for human or veterinary use.">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="index.html">
+
+  <!-- Hidden form so Netlify detects & stores the email-gate submissions.
+       The visible gate is injected by site.js and posts to this form by name.
+       Do not remove. -->
+  <form name="lead-gate" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <input type="email" name="email" />
+    <input type="text" name="bot-field" />
+  </form>
+
+  <section class="hero">
+    <div class="wrap"><div class="hero-inner">
+      <span class="eyebrow">● Research Use Only · ISO-minded QC</span>
+      <h1>High-purity peptide reference standards for the research bench.</h1>
+      <p>Halocompounds supplies lyophilized research peptides with third-party purity verification, full specifications, and per-lot documentation — built for reproducible in-vitro laboratory work.</p>
+      <div class="hero-cta">
+        <a class='btn btn-primary' href='/shop'>Browse the catalog</a>
+        <a class='btn btn-ghost' href='/compliance' style='color:#eaf2f8;border-color:rgba(255,255,255,.25)'>Read our compliance policy</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="n">≥98–99%</div><div class="l">Verified purity (HPLC)</div></div>
+        <div class="stat"><div class="n">Per-lot</div><div class="l">COA documentation</div></div>
+        <div class="stat"><div class="n">RUO</div><div class="l">Strict research-only policy</div></div>
+      </div>
+    </div></div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Why researchers choose Halocompounds</span>
+        <h2>Documentation-first reference materials</h2>
+        <p>Every product page lists CAS, molecular formula, mass, purity, and storage — so you know exactly what you are receiving.</p>
+      </div>
+      <div class="trust-grid">
+        <div class="trust-card">
+          <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+          <h3>Verified purity</h3>
+          <p>HPLC and mass-spec characterization with purity reported on every listing.</p>
+        </div>
+        <div class="trust-card">
+          <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <h3>Per-lot COA</h3>
+          <p>Certificate of analysis available for each lot to support reproducible methods.</p>
+        </div>
+        <div class="trust-card">
+          <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <h3>RUO compliance</h3>
+          <p>Clear research-only positioning, intended-use attestation, and no human-use claims.</p>
+        </div>
+        <div class="trust-card">
+          <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"/></svg></div>
+          <h3>Cold-chain packing</h3>
+          <p>Lyophilized and shipped to preserve stability, with handling guidance on every order.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Featured reference standards</span>
+        <h2>Popular in the catalog</h2>
+        <p>Sold strictly as laboratory reference materials for in-vitro research. Not for human or veterinary use.</p>
+      </div>
+      <div class="product-grid" id="featuredGrid"></div>
+      <div class="center" style="margin-top:36px"><a class='btn btn-dark' href='/shop'>View full catalog</a></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="callout-strong">
+        <h3>A word on intended use</h3>
+        <p>Halocompounds products are chemical reference materials supplied for laboratory and research purposes only. They are not drugs, supplements, foods, or cosmetics, and are not intended for human or veterinary use, nor for any diagnostic or therapeutic application. Purchasing requires confirmation that you are a qualified researcher and agree to use these materials lawfully and safely. See our <a href='/compliance' style='color:#7fe3d9'>Compliance Policy</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/site.js"></script>
+  <script>
+    (function () {
+      var grid = document.getElementById("featuredGrid");
+      var items = Halo.products().filter(function (p) { return p.featured; });
+      grid.innerHTML = items.map(function (p) {
+        var from = Math.min.apply(null, p.sizes.map(function (s) { return s.price; }));
+        return '<a class="pcard" href="product.html?sku=' + p.sku + '" style="text-decoration:none;color:inherit">' +
+          '<div class="vial"><span class="ruo-tag">RUO</span><span class="purity-tag">' + p.purity + '</span>' + Halo.vial + '</div>' +
+          '<div class="body"><div class="cat">' + p.category + '</div><h3>' + p.name + '</h3>' +
+          '<div class="cas">CAS ' + p.cas + '</div>' +
+          '<div class="spec-mini">' + p.form + ' · ' + p.mw + '</div>' +
+          '<div class="foot"><span class="price">' + Halo.money(from) + ' <small>from</small></span>' +
+          '<span class="btn btn-ghost" style="padding:8px 14px;font-size:13px">View</span></div></div></a>';
+      }).join("");
+    })();
+  </script>
+</body>
+</html>

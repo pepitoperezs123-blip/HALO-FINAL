@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Halocompounds | Research Use Only</title>
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="checkout.html">
+
+  <div class="page-head">
+    <div class="wrap"><div class="crumb"><a href='/'>Home</a> / Checkout</div><h1>Checkout</h1></div>
+  </div>
+
+  <section class="section">
+    <div class="wrap">
+      <div id="emptyState" class="empty-cart hide">Your cart is empty. <a href='/shop'>Browse the catalog</a>.</div>
+
+      <div class="checkout-layout" id="checkoutLayout">
+        <form id="orderForm" novalidate>
+          <h3 style="margin-bottom:16px">Researcher &amp; shipping details</h3>
+          <div class="form-grid">
+            <div class="field"><label>First name *</label><input name="first" required></div>
+            <div class="field"><label>Last name *</label><input name="last" required></div>
+            <div class="field"><label>Institution / Company *</label><input name="org" required></div>
+            <div class="field"><label>Role / Title</label><input name="role" placeholder="e.g. Research Scientist"></div>
+            <div class="field full"><label>Work email *</label><input type="email" name="email" required></div>
+            <div class="field"><label>Phone</label><input name="phone"></div>
+            <div class="field"><label>Country *</label><input name="country" required></div>
+            <div class="field full"><label>Shipping address *</label><input name="address" required></div>
+            <div class="field"><label>City *</label><input name="city" required></div>
+            <div class="field"><label>State / Region</label><input name="state"></div>
+            <div class="field"><label>Postal code *</label><input name="zip" required></div>
+            <div class="field full"><label>Order notes</label><textarea name="notes" rows="3" placeholder="Optional: lot requirements, COA needs, etc."></textarea></div>
+          </div>
+
+          <h3 style="margin:24px 0 12px">Required research-use acknowledgment</h3>
+          <div class="attest">
+            <label class="ck"><input type="checkbox" name="a1"> I confirm I am at least 21 years of age.</label>
+            <label class="ck"><input type="checkbox" name="a2"> I am a qualified researcher, or I am purchasing on behalf of a research institution, laboratory, or business.</label>
+            <label class="ck"><input type="checkbox" name="a3"> I understand these products are sold strictly for <strong>laboratory research use only (RUO)</strong> and are <strong>not for human or veterinary use</strong>, and are not drugs, foods, cosmetics, or dietary supplements.</label>
+            <label class="ck"><input type="checkbox" name="a4"> I will not administer, ingest, or use these materials in or on humans or animals, and I will handle them lawfully and in accordance with good laboratory practice.</label>
+            <label class="ck"><input type="checkbox" name="a5"> I have read and agree to the <a href='/terms' target='_blank'>Terms of Sale</a>, <a href='/compliance' target='_blank'>Compliance Policy</a>, and <a href='/privacy' target='_blank'>Privacy Policy</a>.</label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="placeBtn">Place research order</button>
+          <p style="font-size:12.5px;color:var(--muted);margin-top:12px">Orders are reviewed for research-use eligibility. After review, a secure payment link / invoice is issued to your work email. Card details are never collected on this page.</p>
+        </form>
+
+        <aside class="summary">
+          <h3>Order summary</h3>
+          <div id="summaryLines"></div>
+          <div class="ln"><span>Subtotal</span><span id="sumSubtotal">$0.00</span></div>
+          <div class="ln"><span>Shipping</span><span>Calculated after review</span></div>
+          <div class="ln tot"><span>Total</span><span id="sumTotal">$0.00</span></div>
+          <div class="ruo-callout" style="margin-top:18px"><strong>RUO order</strong><p>By placing this order you reaffirm the research-use acknowledgment above.</p></div>
+        </aside>
+      </div>
+
+      <div id="confirm" class="hide" style="max-width:640px;margin:0 auto;text-align:center">
+        <div style="width:64px;height:64px;border-radius:50%;background:rgba(47,143,91,.12);color:var(--ok);display:grid;place-items:center;margin:0 auto 20px">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h1 style="font-size:28px">Order request received</h1>
+        <p style="color:var(--slate);margin:12px 0">Reference <strong id="orderRef" class="mono"></strong></p>
+        <p style="color:var(--slate)">Thank you. Our team will verify research-use eligibility and email a secure payment link and order confirmation to the address you provided. No payment has been taken.</p>
+        <div style="margin-top:26px"><a class='btn btn-dark' href='/shop'>Continue browsing</a></div>
+      </div>
+    </div>
+  </section>
+
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/site.js"></script>
+  <script src="assets/js/noramp-checkout.js"></script>
+  <script>
+    (function () {
+      var layout = document.getElementById("checkoutLayout");
+      var empty = document.getElementById("emptyState");
+      var cart = Halo.getCart();
+      if (!cart.length) {
+        layout.classList.add("hide");
+        empty.classList.remove("hide");
+        return;
+      }
+      function renderSummary() {
+        var c = Halo.getCart();
+        document.getElementById("summaryLines").innerHTML = c.map(function (i) {
+          return '<div class="ln"><span>' + i.name + ' (' + i.size + ') × ' + i.qty + '</span><span>' + Halo.money(i.price * i.qty) + '</span></div>';
+        }).join("");
+        document.getElementById("sumSubtotal").textContent = Halo.money(Halo.subtotal());
+        document.getElementById("sumTotal").textContent = Halo.money(Halo.subtotal());
+      }
+      renderSummary();
+
+      var form = document.getElementById("orderForm");
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        var missing = false;
+        form.querySelectorAll("[required]").forEach(function (f) {
+          if (!f.value.trim()) { f.style.borderColor = "var(--red)"; missing = true; }
+          else f.style.borderColor = "";
+        });
+        var allChecked = ["a1", "a2", "a3", "a4", "a5"].every(function (n) { return form.elements[n].checked; });
+        if (!allChecked) {
+          alert("Please confirm all research-use acknowledgments to place your order.");
+          return;
+        }
+        if (missing) {
+          alert("Please complete all required fields marked with *.");
+          return;
+        }
+
+        var cust = Object.fromEntries(new FormData(form).entries());
+        var ref = "HC-" + Date.now().toString(36).toUpperCase();
+
+        if (window.startNorampCheckout) {
+          var order = {
+            id: ref, key: ref, number: ref, currency: "USD",
+            subtotal: Halo.subtotal().toFixed(2),
+            total: Halo.subtotal().toFixed(2),
+            items: Halo.getCart().map(function (i) {
+              return { name: i.name, product_id: i.sku, quantity: i.qty, total: (i.price * i.qty).toFixed(2) };
+            }),
+            customer: { email: cust.email, first_name: cust.first, last_name: cust.last, phone: cust.phone, company: cust.org },
+            shipping_to: { first_name: cust.first, last_name: cust.last, address_1: cust.address, city: cust.city, state: cust.state, postcode: cust.zip, country: cust.country }
+          };
+          try {
+            var btn = document.getElementById("placeBtn");
+            if (btn) { btn.disabled = true; btn.textContent = "Redirecting to secure checkout…"; }
+            await window.startNorampCheckout(order);
+            return;
+          } catch (err) {
+            console.warn("NoRamp checkout not active yet, using request flow:", err.message);
+            var b2 = document.getElementById("placeBtn");
+            if (b2) { b2.disabled = false; b2.textContent = "Place research order"; }
+          }
+        }
+
+        console.log("Halocompounds order payload", { ref: ref, customer: cust, items: Halo.getCart(), subtotal: Halo.subtotal() });
+        document.getElementById("orderRef").textContent = ref;
+        layout.classList.add("hide");
+        document.getElementById("confirm").classList.remove("hide");
+        Halo.clearCart();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    })();
+  </script>
+</body>
+</html>

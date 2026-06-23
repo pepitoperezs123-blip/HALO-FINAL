@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catalog — Halocompounds | Research Use Only</title>
+<meta name="description" content="Browse Halocompounds peptide reference standards. For laboratory research use only.">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="shop.html">
+
+  <div class="page-head">
+    <div class="wrap">
+      <div class="crumb"><a href='/'>Home</a> / Catalog</div>
+      <h1>Reference standards catalog</h1>
+      <p style="color:var(--slate);margin-top:8px;max-width:640px">All listings are lyophilized peptide reference materials supplied for laboratory research use only. Not for human or veterinary use.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="shop-layout">
+        <aside class="filters">
+          <input type="text" class="search-box" id="search" placeholder="Search name or CAS…">
+          <h4>Category</h4>
+          <div id="catFilters"></div>
+        </aside>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+            <span id="resultCount" style="color:var(--slate);font-size:14px"></span>
+            <select id="sort" class="search-box" style="width:auto;margin:0;padding:9px 12px">
+              <option value="name">Sort: Name (A–Z)</option>
+              <option value="priceLow">Price: Low to High</option>
+              <option value="priceHigh">Price: High to Low</option>
+            </select>
+          </div>
+          <div class="product-grid" id="grid"></div>
+          <div id="noResults" class="empty-cart hide">No products match your filters.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/site.js"></script>
+  <script>
+    (function () {
+      var all = Halo.products();
+      var grid = document.getElementById("grid");
+      var search = document.getElementById("search");
+      var sortSel = document.getElementById("sort");
+      var catWrap = document.getElementById("catFilters");
+      var resultCount = document.getElementById("resultCount");
+      var noResults = document.getElementById("noResults");
+      var activeCats = {};
+
+      var params = new URLSearchParams(location.search);
+      var preCat = params.get("cat");
+
+      var cats = [];
+      all.forEach(function (p) { if (cats.indexOf(p.category) < 0) cats.push(p.category); });
+      catWrap.innerHTML = cats.map(function (c) {
+        var checked = (preCat === c) ? " checked" : "";
+        if (checked) activeCats[c] = true;
+        return '<label><input type="checkbox" value="' + c + '"' + checked + '> ' + c + '</label>';
+      }).join("");
+      catWrap.querySelectorAll("input").forEach(function (cb) {
+        cb.addEventListener("change", function () {
+          if (cb.checked) activeCats[cb.value] = true; else delete activeCats[cb.value];
+          render();
+        });
+      });
+
+      function priceFrom(p) { return Math.min.apply(null, p.sizes.map(function (s) { return s.price; })); }
+
+      function render() {
+        var q = search.value.trim().toLowerCase();
+        var list = all.filter(function (p) {
+          var catOk = Object.keys(activeCats).length === 0 || activeCats[p.category];
+          var qOk = !q || p.name.toLowerCase().indexOf(q) >= 0 || p.cas.indexOf(q) >= 0;
+          return catOk && qOk;
+        });
+        var s = sortSel.value;
+        list.sort(function (a, b) {
+          if (s === "priceLow") return priceFrom(a) - priceFrom(b);
+          if (s === "priceHigh") return priceFrom(b) - priceFrom(a);
+          return a.name.localeCompare(b.name);
+        });
+        resultCount.textContent = list.length + " product" + (list.length === 1 ? "" : "s");
+        noResults.classList.toggle("hide", list.length > 0);
+        grid.innerHTML = list.map(function (p) {
+          return '<a class="pcard" href="product.html?sku=' + p.sku + '" style="text-decoration:none;color:inherit">' +
+            '<div class="vial"><span class="ruo-tag">RUO</span><span class="purity-tag">' + p.purity + '</span>' + Halo.vial + '</div>' +
+            '<div class="body"><div class="cat">' + p.category + '</div><h3>' + p.name + '</h3>' +
+            '<div class="cas">CAS ' + p.cas + '</div>' +
+            '<div class="spec-mini">' + p.form + ' · ' + p.mw + '</div>' +
+            '<div class="foot"><span class="price">' + Halo.money(priceFrom(p)) + ' <small>from</small></span>' +
+            '<span class="btn btn-ghost" style="padding:8px 14px;font-size:13px">View</span></div></div></a>';
+        }).join("");
+      }
+      search.addEventListener("input", render);
+      sortSel.addEventListener("change", render);
+      render();
+    })();
+  </script>
+</body>
+</html>
