@@ -6,6 +6,7 @@
 
   var CART_KEY = "halo_cart_v1";
   var LEAD_KEY = "halo_lead_ok_v1";
+  var AGE_KEY  = "halo_age_ok_v1";   // sessionStorage — cleared when tab/browser closes
   var LEAD_FORM_NAME = "lead-gate";
 
   var LOGO = '<svg class="logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
@@ -101,9 +102,16 @@
   }
 
   /* ================= ACCESS GATE (age + RUO combined) =================
-     Shown on every page load — never persisted to localStorage.
+     Uses sessionStorage so it shows once per browser session.
+     Closing the tab / browser clears it; navigating within the site does not.
   */
+  function ageOk() {
+    try { return sessionStorage.getItem(AGE_KEY) === "1"; } catch (e) { return false; }
+  }
+
   function buildAgeGate() {
+    if (ageOk()) return;   // already confirmed this session — skip
+
     var g = document.createElement("div");
     g.className = "agegate show";
     g.id = "ageGate";
@@ -145,6 +153,7 @@
     c2.addEventListener("change", refresh);
 
     btn.addEventListener("click", function () {
+      try { sessionStorage.setItem(AGE_KEY, "1"); } catch (e) { }
       g.remove();
       document.body.style.overflow = "";
     });
