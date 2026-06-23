@@ -8,7 +8,6 @@
 
   var MIN_AGE = 21;
   var CART_KEY = "halo_cart_v1";
-  var AGE_KEY = "halo_age_ok_v1";
   var LEAD_KEY = "halo_lead_ok_v1";
   var LEAD_FORM_NAME = "lead-gate"; // matches the hidden Netlify form in index.html
 
@@ -101,9 +100,10 @@
     if (sub) sub.textContent = money(cartSubtotal());
   }
 
-  function ageOk() { return localStorage.getItem(AGE_KEY) === "1"; }
+  /* ================= AGE GATE =================
+     Always shown on every page load — confirmation is never persisted.
+  */
   function buildAgeGate() {
-    if (ageOk()) return;
     var g = document.createElement("div");
     g.className = "agegate show";
     g.id = "ageGate";
@@ -118,12 +118,12 @@
     document.body.appendChild(g);
     document.body.style.overflow = "hidden";
     $("#ageYes").addEventListener("click", function () {
-      localStorage.setItem(AGE_KEY, "1");
       g.remove();
       document.body.style.overflow = "";
     });
   }
 
+  /* ================= EMAIL GATE (full page) ================= */
   function leadOk() { return localStorage.getItem(LEAD_KEY) === "1"; }
 
   function formEncode(data) {
