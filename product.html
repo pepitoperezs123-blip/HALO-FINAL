@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product — Halocompounds | Research Use Only</title>
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="shop.html">
+
+  <div class="wrap" style="padding-top:30px">
+    <div class="crumb" style="font-size:13px;color:var(--muted)"><a href='/'>Home</a> / <a href='/shop'>Catalog</a> / <span id="crumbName">Product</span></div>
+  </div>
+
+  <section class="section" style="padding-top:24px" id="productRoot">
+    <div class="wrap"><div id="notFound" class="empty-cart hide">Product not found. <a href='/shop'>Back to catalog</a>.</div>
+      <div class="pd" id="pd"></div>
+
+      <div class="tabs" id="tabsRoot" style="display:none">
+        <div class="tab-btns">
+          <button class="active" data-tab="overview">Research Overview</button>
+          <button data-tab="specs">Specifications</button>
+          <button data-tab="handling">Handling &amp; Storage</button>
+        </div>
+        <div class="tab-panel" id="tab-overview"></div>
+        <div class="tab-panel hide" id="tab-specs"></div>
+        <div class="tab-panel hide" id="tab-handling"></div>
+      </div>
+    </div>
+  </section>
+
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/site.js"></script>
+  <script>
+    (function () {
+      var sku = new URLSearchParams(location.search).get("sku");
+      var p = Halo.get(sku);
+      var pd = document.getElementById("pd");
+      if (!p) {
+        document.getElementById("notFound").classList.remove("hide");
+        pd.style.display = "none";
+        return;
+      }
+      document.title = p.name + " — Halocompounds | Research Use Only";
+      document.getElementById("crumbName").textContent = p.name;
+      document.getElementById("tabsRoot").style.display = "block";
+
+      var selectedSize = p.sizes[0];
+
+      function sizeButtons() {
+        return p.sizes.map(function (s, i) {
+          return '<button class="size-opt' + (i === 0 ? ' active' : '') + '" data-i="' + i + '">' + s.label + ' — ' + Halo.money(s.price) + '</button>';
+        }).join("");
+      }
+
+      pd.innerHTML =
+        '<div class="pd-media">' + Halo.vial + '</div>' +
+        '<div><div class="cat">' + p.category + '</div>' +
+        '<span class="badge-ruo">Research Use Only</span>' +
+        '<h1 style="margin-top:12px">' + p.name + '</h1>' +
+        '<div class="cas">CAS ' + p.cas + ' · ' + p.formula + '</div>' +
+        '<p style="color:var(--slate)">' + p.summary + '</p>' +
+        '<div class="price-row"><span class="price" id="price">' + Halo.money(selectedSize.price) + '</span><span style="color:var(--muted);font-size:14px">' + p.purity + ' purity</span></div>' +
+        '<div style="font-size:13px;color:var(--slate);font-weight:600;margin-bottom:6px">Size</div>' +
+        '<div class="size-select" id="sizeSelect">' + sizeButtons() + '</div>' +
+        '<div style="display:flex;gap:12px;align-items:center;margin:18px 0">' +
+        '<div class="qty"><button id="qMinus">−</button><input id="qty" type="number" value="1" min="1"><button id="qPlus">+</button></div>' +
+        '<button class="btn btn-primary" id="addBtn" style="flex:1">Add to cart</button></div>' +
+        '<div class="ruo-callout"><strong>Not for human or veterinary use</strong><p>This material is a chemical reference standard sold for in-vitro laboratory research only. It is not a drug, supplement, food, or cosmetic and must not be administered to humans or animals.</p></div>' +
+        '</div>';
+
+      document.getElementById("tab-overview").innerHTML =
+        '<p>' + p.summary + '</p><p>' + p.research + '</p>' +
+        '<p style="font-size:13px;color:var(--muted)">Halocompounds makes no representation that this material is safe or effective for any use other than the laboratory research described above. No therapeutic, diagnostic, or human-use claims are made.</p>';
+
+      document.getElementById("tab-specs").innerHTML =
+        '<table class="spec-table">' +
+        '<tr><th>CAS Number</th><td>' + p.cas + '</td></tr>' +
+        '<tr><th>Molecular Formula</th><td>' + p.formula + '</td></tr>' +
+        '<tr><th>Molecular Weight</th><td>' + p.mw + '</td></tr>' +
+        '<tr><th>Purity (HPLC)</th><td>' + p.purity + '</td></tr>' +
+        '<tr><th>Physical Form</th><td>' + p.form + '</td></tr>' +
+        '<tr><th>Catalog No.</th><td>' + p.sku + '</td></tr>' +
+        '</table><p style="font-size:13px;color:var(--muted)">A certificate of analysis (COA) for the shipped lot is available on request.</p>';
+
+      document.getElementById("tab-handling").innerHTML =
+        '<p><strong>Storage:</strong> ' + p.storage + '.</p>' +
+        '<p>Handle in accordance with good laboratory practice. Use appropriate personal protective equipment. Reconstitution, if applicable, should be performed by trained laboratory personnel using suitable solvents and aseptic technique.</p>' +
+        '<p style="font-size:13px;color:var(--muted)">Intended for use by qualified researchers in a controlled laboratory environment only.</p>';
+
+      var sizeWrap = document.getElementById("sizeSelect");
+      sizeWrap.querySelectorAll(".size-opt").forEach(function (b) {
+        b.addEventListener("click", function () {
+          sizeWrap.querySelectorAll(".size-opt").forEach(function (x) { x.classList.remove("active"); });
+          b.classList.add("active");
+          selectedSize = p.sizes[+b.dataset.i];
+          document.getElementById("price").textContent = Halo.money(selectedSize.price);
+        });
+      });
+      var qty = document.getElementById("qty");
+      document.getElementById("qMinus").addEventListener("click", function () { qty.value = Math.max(1, (+qty.value || 1) - 1); });
+      document.getElementById("qPlus").addEventListener("click", function () { qty.value = (+qty.value || 1) + 1; });
+      document.getElementById("addBtn").addEventListener("click", function () {
+        Halo.addToCart({ sku: p.sku, name: p.name, size: selectedSize.label, price: selectedSize.price, qty: Math.max(1, +qty.value || 1) });
+      });
+
+      document.querySelectorAll(".tab-btns button").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll(".tab-btns button").forEach(function (x) { x.classList.remove("active"); });
+          btn.classList.add("active");
+          ["overview", "specs", "handling"].forEach(function (t) {
+            document.getElementById("tab-" + t).classList.toggle("hide", t !== btn.dataset.tab);
+          });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

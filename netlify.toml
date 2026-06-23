@@ -1,0 +1,15 @@
+# Netlify config—tells Netlify where the serverless functions live and
+# rewrites the clean /api/* paths to them.
+
+[build]
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/payment-checkout"
+  to = "/.netlify/functions/payment-checkout"
+  status = 200
+
+[[redirects]]
+  from = "/api/payment-callback"
+  to = "/.netlify/functions/payment-callback"
+  status = 200

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Halocompounds</title>
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="contact.html">
+  <div class="page-head"><div class="wrap"><div class="crumb"><a href='/'>Home</a> / Contact</div><h1>Contact us</h1></div></div>
+  <div class="wrap"><div class="doc">
+    <p>Questions about products, specifications, COAs, bulk research quantities, or an existing order? Send us a message and our team will respond.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:start;margin-top:30px">
+      <form id="contactForm">
+        <div class="field"><label>Name *</label><input name="name" required></div>
+        <div class="field"><label>Institution / Company</label><input name="org"></div>
+        <div class="field"><label>Work email *</label><input type="email" name="email" required></div>
+        <div class="field"><label>Subject</label><input name="subject"></div>
+        <div class="field"><label>Message *</label><textarea name="message" rows="5" required></textarea></div>
+        <button class="btn btn-primary btn-block" type="submit">Send message</button>
+        <p id="contactMsg" class="hide" style="color:var(--ok);font-size:14px;margin-top:12px;font-weight:600">Thanks — your message has been recorded. We’ll be in touch.</p>
+      </form>
+      <div>
+        <div class="trust-card">
+          <h3 style="margin-bottom:10px">Reach us</h3>
+          <p style="font-size:14px;color:var(--slate);margin-bottom:6px"><strong>Email:</strong> [support@yourdomain.com]</p>
+          <p style="font-size:14px;color:var(--slate);margin-bottom:6px"><strong>Hours:</strong> [Mon–Fri, 9–5]</p>
+          <p style="font-size:14px;color:var(--slate)"><strong>Address:</strong> [Business address]</p>
+        </div>
+        <div class="ruo-callout" style="margin-top:18px"><strong>Research use only</strong><p>We cannot provide medical, dosing, or human-use guidance. Products are sold strictly as laboratory reference materials.</p></div>
+      </div>
+    </div>
+
+    <p style="font-size:13px;color:var(--muted);margin-top:30px"><em>This form records submissions client-side in this static build. Wire the form to your email service or backend (e.g. Formspree, or a POST to your API) before launch.</em></p>
+  </div></div>
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/site.js"></script>
+  <script>
+    document.getElementById("contactForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var f = e.target;
+      var ok = true;
+      f.querySelectorAll("[required]").forEach(function (x){ if(!x.value.trim()){x.style.borderColor="var(--red)";ok=false;}else x.style.borderColor="";});
+      if(!ok) return;
+      console.log("Halocompounds contact", Object.fromEntries(new FormData(f).entries()));
+      f.reset();
+      document.getElementById("contactMsg").classList.remove("hide");
+    });
+  </script>
+</body>
+</html>
