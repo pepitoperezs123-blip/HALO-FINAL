@@ -255,9 +255,9 @@
       '<div class="fcol"><a class="brand" href="index.html">' + LOGO + '<span class="name">Halo<span>compounds</span></span></a>' +
       '<p class="footer-blurb">High-purity peptide reference standards for the global research community. Every lot is supplied for laboratory research use only.</p></div>' +
       '<div class="fcol"><h4>Catalog</h4>' +
-      '<a href="shop.html?cat=Metabolic Research">Metabolic Research</a>' +
-      '<a href="shop.html?cat=Tissue Research">Tissue Research</a>' +
-      '<a href="shop.html?cat=Growth Factor Research">Growth Factor</a>' +
+      '<a href="shop.html?cat=Metabolic%20Pathway%20Research">Metabolic Pathway</a>' +
+      '<a href="shop.html?cat=GH-Axis%20Receptor%20Research">GH-Axis Receptor</a>' +
+      '<a href="shop.html?cat=Wound-Assay%20%26%20Matrix%20Research">Wound &amp; Matrix</a>' +
       '<a href="shop.html">All products</a></div>' +
       '<div class="fcol"><h4>Company</h4><a href="about.html">About</a><a href="contact.html">Contact</a><a href="compliance.html">Compliance</a></div>' +
       '<div class="fcol"><h4>Legal</h4><a href="terms.html">Terms of Sale</a><a href="privacy.html">Privacy Policy</a><a href="shipping-returns.html">Shipping &amp; Returns</a></div>' +
