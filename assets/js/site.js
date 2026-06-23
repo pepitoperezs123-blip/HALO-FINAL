@@ -1,15 +1,12 @@
 /* ============================================================
    Halocompounds — shared site script
-   Injects compliance bar, header, footer, age gate, cart drawer.
-   Manages cart state in localStorage. No backend required.
    ============================================================ */
 (function () {
   "use strict";
 
-  var MIN_AGE = 21;
   var CART_KEY = "halo_cart_v1";
   var LEAD_KEY = "halo_lead_ok_v1";
-  var LEAD_FORM_NAME = "lead-gate"; // matches the hidden Netlify form in index.html
+  var LEAD_FORM_NAME = "lead-gate";
 
   var LOGO = '<svg class="logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
     '<circle cx="24" cy="24" r="20" stroke="#13b0a5" stroke-width="3"/>' +
@@ -27,6 +24,7 @@
   function $(sel, ctx) { return (ctx || document).querySelector(sel); }
   function money(n) { return "$" + Number(n).toFixed(2); }
 
+  /* ================= CART ================= */
   function getCart() {
     try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
     catch (e) { return []; }
@@ -63,6 +61,7 @@
     b.style.display = n ? "grid" : "none";
   }
 
+  /* ================= TOAST ================= */
   var toastTimer;
   function toast(msg) {
     var t = $("#toast");
@@ -73,6 +72,7 @@
     toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2400);
   }
 
+  /* ================= DRAWER ================= */
   function openDrawer() { var o = $("#drawerOverlay"), d = $("#cartDrawer"); if (o) o.classList.add("open"); if (d) d.classList.add("open"); }
   function closeDrawer() { var o = $("#drawerOverlay"), d = $("#cartDrawer"); if (o) o.classList.remove("open"); if (d) d.classList.remove("open"); }
 
@@ -100,30 +100,57 @@
     if (sub) sub.textContent = money(cartSubtotal());
   }
 
-  /* ================= AGE GATE =================
-     Always shown on every page load — confirmation is never persisted.
+  /* ================= ACCESS GATE (age + RUO combined) =================
+     Shown on every page load — never persisted to localStorage.
   */
   function buildAgeGate() {
     var g = document.createElement("div");
     g.className = "agegate show";
     g.id = "ageGate";
     g.innerHTML =
-      '<div class="box">' + LOGO +
-      '<h2>Research professionals only</h2>' +
-      '<p>The products on this site are sold strictly as chemical reference materials <strong>for laboratory and research use only (RUO)</strong>.</p>' +
-      '<p>They are <strong>not for human or veterinary use</strong>, not drugs, foods, cosmetics, or dietary supplements, and not for diagnostic or therapeutic use.</p>' +
-      '<p class="fine">By entering you confirm you are at least ' + MIN_AGE + ' years old, are a qualified researcher or purchasing on behalf of a research institution, and accept the Terms of Sale and Compliance Policy.</p>' +
-      '<div class="row"><button class="btn btn-primary" id="ageYes">I confirm &amp; agree</button>' +
-      '<a class="btn btn-ghost" id="ageNo" href="https://www.google.com">Exit</a></div></div>';
+      '<div class="ag-box">' +
+      '<div class="ag-logo">' + LOGO + '</div>' +
+      '<span class="ag-eyebrow">Research Access Only</span>' +
+      '<h2 class="ag-title">Before you enter</h2>' +
+      '<p class="ag-intro">Halocompounds is a supplier of high-purity chemical reference standards for the scientific community. Everything in this catalog is intended <strong>exclusively for in-vitro laboratory and research use</strong> — not for human consumption, veterinary use, or any clinical application.</p>' +
+      '<div class="ag-divider"></div>' +
+      '<p class="ag-confirm-label">To proceed, please confirm both of the following:</p>' +
+      '<div class="ag-checks">' +
+      '<label class="ag-ck" id="ageLabel1">' +
+      '<span class="ag-ck-box"><input type="checkbox" id="ageCheck1"><svg viewBox="0 0 12 10" fill="none"><polyline points="1.5 5 4.5 8 10.5 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
+      '<span class="ag-ck-text">I am <strong>21 years of age or older.</strong></span>' +
+      '</label>' +
+      '<label class="ag-ck" id="ageLabel2">' +
+      '<span class="ag-ck-box"><input type="checkbox" id="ageCheck2"><svg viewBox="0 0 12 10" fill="none"><polyline points="1.5 5 4.5 8 10.5 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
+      '<span class="ag-ck-text">I am a qualified researcher or purchasing on behalf of a research institution, and I will use these materials solely for <strong>laboratory research purposes</strong> — not for human or veterinary use.</span>' +
+      '</label>' +
+      '</div>' +
+      '<button class="btn btn-primary btn-block ag-enter" id="ageYes" disabled>Enter the research catalog</button>' +
+      '<a class="ag-exit" href="https://www.google.com">I do not qualify → Exit</a>' +
+      '</div>';
     document.body.appendChild(g);
     document.body.style.overflow = "hidden";
-    $("#ageYes").addEventListener("click", function () {
+
+    var c1 = g.querySelector("#ageCheck1");
+    var c2 = g.querySelector("#ageCheck2");
+    var btn = g.querySelector("#ageYes");
+
+    function refresh() {
+      var ok = c1.checked && c2.checked;
+      btn.disabled = !ok;
+      g.querySelector("#ageLabel1").classList.toggle("checked", c1.checked);
+      g.querySelector("#ageLabel2").classList.toggle("checked", c2.checked);
+    }
+    c1.addEventListener("change", refresh);
+    c2.addEventListener("change", refresh);
+
+    btn.addEventListener("click", function () {
       g.remove();
       document.body.style.overflow = "";
     });
   }
 
-  /* ================= EMAIL GATE (full page) ================= */
+  /* ================= EMAIL GATE ================= */
   function leadOk() { return localStorage.getItem(LEAD_KEY) === "1"; }
 
   function formEncode(data) {
@@ -141,7 +168,7 @@
     g.innerHTML =
       '<div class="lead-box">' + LOGO +
       '<h2>Enter your email to continue</h2>' +
-      '<p><strong>Everything on this site is intended strictly for laboratory and scientific research purposes only.</strong> These are reference materials &mdash; not for human or veterinary use, and not drugs, foods, or supplements. Enter your work email to access the research catalog.</p>' +
+      '<p><strong>Everything on this site is intended strictly for laboratory and scientific research purposes only.</strong> These are reference materials — not for human or veterinary use, and not drugs, foods, or supplements. Enter your work email to access the research catalog.</p>' +
       '<form id="leadForm" novalidate>' +
       '<input type="email" id="leadEmail" name="email" placeholder="you@institution.com" autocomplete="email" required>' +
       '<button type="submit" class="btn btn-primary btn-block" id="leadBtn">Enter site</button>' +
@@ -182,6 +209,7 @@
     });
   }
 
+  /* ================= HEADER / FOOTER ================= */
   function buildChrome() {
     var page = document.body.getAttribute("data-page") || "";
 
@@ -226,7 +254,7 @@
       '<div class="fcol"><h4>Legal</h4><a href="terms.html">Terms of Sale</a><a href="privacy.html">Privacy Policy</a><a href="shipping-returns.html">Shipping &amp; Returns</a></div>' +
       '</div>' +
       '<div class="footer-ruo"><strong>RESEARCH USE ONLY (RUO) NOTICE.</strong> All products sold by Halocompounds are intended for laboratory and research purposes only. They are not drugs, foods, cosmetics, dietary supplements, or medical devices, and are <strong>not intended for human or veterinary use</strong>, nor for any diagnostic, therapeutic, or clinical application. The statements on this website have not been evaluated by the FDA. By purchasing, the buyer affirms they are a qualified researcher and assumes full responsibility for the safe and lawful handling and use of these materials.</div>' +
-      '<div class="footer-bottom"><span>&copy; ' + new Date().getFullYear() + ' Halocompounds. All rights reserved.</span><span>For laboratory research use only.</span></div>' +
+      '<div class="footer-bottom"><span>© ' + new Date().getFullYear() + ' Halocompounds. All rights reserved.</span><span>For laboratory research use only.</span></div>' +
       '</div>';
     document.body.appendChild(footer);
 
@@ -251,6 +279,7 @@
     if (mt) mt.addEventListener("click", function () { mn.style.display = mn.style.display === "block" ? "none" : "block"; });
   }
 
+  /* ================= EXPOSE ================= */
   window.Halo = {
     products: function () { return window.HALO_PRODUCTS || []; },
     get: function (sku) { return (window.HALO_PRODUCTS || []).find(function (p) { return p.sku === sku; }); },
