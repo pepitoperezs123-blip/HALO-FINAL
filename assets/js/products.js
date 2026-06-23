@@ -10,8 +10,8 @@ window.HALO_PRODUCTS = [
 
   /* ============ METABOLIC PATHWAY RESEARCH ============ */
   {
-    sku: "HC-NN9535-01",
-    name: "NN9535",
+    sku: "HC-SEMA-01",
+    name: "Semaglutide",
     category: "Metabolic Pathway Research",
     cas: "910463-68-2",
     formula: "C187H291N45O59",
@@ -19,14 +19,14 @@ window.HALO_PRODUCTS = [
     purity: "≥99%",
     form: "Lyophilized powder",
     storage: "Store at -20 °C, desiccated, protected from light",
-    summary: "Synthetic GLP-1 receptor analog peptide supplied as a reference standard for in-vitro receptor-binding and metabolic-pathway research.",
+    summary: "Synthetic GLP-1 receptor agonist peptide supplied as a reference standard for in-vitro receptor-binding and metabolic-pathway research.",
     research: "Frequently referenced in laboratory studies of incretin-receptor signaling and peptide-stability assays. Supplied for in-vitro experimental use only.",
     sizes: [{label:"5 mg", price:46}, {label:"10 mg", price:79}],
     featured: true
   },
   {
-    sku: "HC-LY3298176-01",
-    name: "LY3298176",
+    sku: "HC-TIRZ-01",
+    name: "Tirzepatide",
     category: "Metabolic Pathway Research",
     cas: "2023788-19-2",
     formula: "C225H348N48O68",
